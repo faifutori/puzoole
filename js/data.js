@@ -16,7 +16,9 @@
  *   どうぶつの id は「{ゾーンid}_{01からの連番}」です。
  *   この id さえ決めれば、置き場所とファイル名は自動で決まります。
  *
- *   スタンプ絵      img/stamp/stamp_{id}.jpg            500x500（正方形／丸く切り抜いて表示）
+ *   スタンプ絵      img/stamp/stamp_{ゾーンid}.png      500x500（正方形／丸く切り抜いて表示）
+ *                   背景を透過にしておくと、白地にハンコを押した見た目になります
+ *                   ※スタンプだけはゾーンごとに1枚。全6枚です
  *   図鑑・カード絵  img/animal/animal_{id}.jpg          500x500（正方形）
  *   クイズの絵      img/quiz/quiz_{id}_q1.jpg           900x600（横3:2／q1〜q3・任意）
  *   ごほうび画像    img/prize/prize_{id}.png            1200x1200（全問正解の景品）
@@ -27,7 +29,7 @@
  *   園内マップ       img/img1.jpg                       横長。幅1600px以上
  *
  *   例：コツメカワウソ（id: asia_01）なら
- *       img/stamp/stamp_asia_01.jpg
+ *       img/animal/animal_asia_01.jpg
  *       phone/iphone/wall_iphone_asia_01.png
  *
  *   ゾーンid： asia / africa / elephant / polarbear / monkey / kodomo

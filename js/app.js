@@ -62,7 +62,8 @@ function setRuby(node, text){
  * 画像の置き場所（命名規則はここに集約）
  * ============================================================ */
 var PATH = {
-  stamp:  function(id){ return 'img/stamp/stamp_' + id + '.jpg'; },
+  /* スタンプ絵はゾーンごとに1枚。どうぶつごとではありません */
+  stamp:  function(zoneId){ return 'img/stamp/stamp_' + zoneId + '.png'; },
   animal: function(id){ return 'img/animal/animal_' + id + '.jpg'; },
   quiz:   function(id, n){ return 'img/quiz/quiz_' + id + '_q' + n + '.jpg'; },
   prize:  function(id){ return 'img/prize/prize_' + id + '.png'; },
@@ -91,11 +92,11 @@ function imgOrFallback(src, altText, buildFallback){
   img.src = src;
   return img;
 }
-/* 名前を朱書きした代替表示（スタンプ用） */
-function stampAlt(animal){
+/* 名前を朱書きした代替表示（スタンプ用）。ゾーン名でも動物名でも使えます */
+function stampAlt(label){
   var box = el('div','stamp-alt');
   box.appendChild(el('div','mark', MARK_PAW));
-  box.appendChild(setRuby(el('div','nm'), animal.name));
+  box.appendChild(setRuby(el('div','nm'), label));
   return box;
 }
 /* 図鑑サムネ用の代替表示 */
@@ -252,12 +253,14 @@ function renderSheet(){
     var slot = el('div','stamp-slot' + (animal ? ' got' : '') + (done ? ' complete' : '') +
                        (zone.id === justPressed ? ' press' : ''));
     slot.style.setProperty('--zone-color', zone.color);
+    /* 小さい文字用の濃い色。CSS 側で --zt-{ゾーンid} として定義しています */
+    slot.style.setProperty('--zone-text', 'var(--zt-' + zone.id + ')');
 
     var ring = el('div','stamp-ring');
     if(animal){
       ring.appendChild(imgOrFallback(
-        PATH.stamp(animal.id), plain(animal.name) + 'のスタンプ',
-        function(){ return stampAlt(animal); }
+        PATH.stamp(zone.id), plain(zone.name) + 'のスタンプ',
+        function(){ return stampAlt(zone.name); }
       ));
     }else{
       ring.appendChild(el('div','stamp-empty', MARK_PAW));
@@ -303,6 +306,7 @@ function renderZukan(){
 
     var card = el('div','zukan-card' + (cleared ? ' cleared' : ''));
     card.style.setProperty('--zone-color', zone.color);
+    card.style.setProperty('--zone-text', 'var(--zt-' + zone.id + ')');
 
     var hit = el('button','zukan-hit');
     hit.type = 'button';
@@ -592,9 +596,10 @@ function showPress(zone, animal){
 
   var ring = el('div','press-ring');
   ring.style.setProperty('--zone-color', zone.color);
+  ring.style.setProperty('--zone-text', 'var(--zt-' + zone.id + ')');
   ring.appendChild(imgOrFallback(
-    PATH.stamp(animal.id), plain(animal.name) + 'のスタンプ',
-    function(){ return stampAlt(animal); }
+    PATH.animal(animal.id), plain(animal.name),
+    function(){ return stampAlt(animal.name); }
   ));
   body.appendChild(ring);
 

@@ -23,14 +23,27 @@
   --ink-2: #6E6558;
   --ink-3: #978B78;
 
-  /* 朱肉とゾーン色 */
+  /* 朱肉 */
   --stamp:       #B8483A;
-  --z-asia:      #3E7D5E;
-  --z-africa:    #B07A28;
-  --z-elephant:  #3D6E92;
-  --z-polarbear: #45808F;
-  --z-monkey:    #77557F;
-  --z-kodomo:    #B8483A;
+
+  /* ゾーン色。img/stamp/stamp_*.png の輪郭線から実測した値です。
+     スタンプ絵を描きかえたら、ここも合わせて直してください。 */
+  --z-asia:      #337C57;
+  --z-africa:    #D49626;
+  --z-elephant:  #E76C66;
+  --z-polarbear: #35A1CA;
+  --z-monkey:    #945399;
+  --z-kodomo:    #1A80BB;
+
+  /* 上の色をそのまま小さい文字に使うと、クリーム色の紙の上で薄くて
+     読めません（金色で 2.5:1 など）。文字と、白ヌキ文字を乗せる地色には
+     同系統で濃くしたこちらを使います（いずれも 4.5:1 以上）。 */
+  --zt-asia:      #337C57;
+  --zt-africa:    #996C1B;
+  --zt-elephant:  #B95652;
+  --zt-polarbear: #287A9A;
+  --zt-monkey:    #945399;
+  --zt-kodomo:    #197BB4;
 
   --radius:    14px;
   --radius-sm: 8px;
@@ -224,7 +237,8 @@ section{ margin-bottom:34px; }
   color:var(--line-strong);
 }
 .stamp-slot.got .stamp-ring{
-  border:4px solid var(--zone-color, var(--stamp));
+  /* 二重線の枠。内側に円を浮かせず、枠そのものを二本線にしています */
+  border:7px double var(--zone-color, var(--stamp));
   background:#fff;
   color:var(--zone-color, var(--stamp));
   transform:rotate(-5deg);
@@ -235,15 +249,7 @@ section{ margin-bottom:34px; }
 .stamp-slot.press .stamp-ring{
   animation:stamp-press .45s cubic-bezier(.2,.9,.3,1);
 }
-/* 押印の二重リング */
-.stamp-slot.got .stamp-ring::after{
-  content:'';
-  position:absolute; inset:7px;
-  border-radius:50%;
-  border:1.5px solid currentColor;
-  opacity:.55;
-  pointer-events:none;
-}
+/* 内側に浮かせる円は使いません（枠自体が二重線のため） */
 /* 台紙のマス用。拡大しすぎると、列幅の広い端末（430px 幅など）で
    回転後の外接矩形が画面をはみ出して横スクロールが出るため控えめに。 */
 @keyframes stamp-press{
@@ -273,7 +279,7 @@ section{ margin-bottom:34px; }
 .stamp-alt .nm{
   font-family:var(--font-display);
   font-size:11px; line-height:1.7;
-  color:currentColor;
+  color:var(--zone-text, currentColor);
 }
 
 .stamp-label{
@@ -283,18 +289,18 @@ section{ margin-bottom:34px; }
 .stamp-slot.got .stamp-label{ color:var(--ink); }
 .stamp-name{
   font-size:11.5px; line-height:1.8; font-weight:700; text-align:center;
-  color:var(--zone-color, var(--stamp));
+  color:var(--zone-text, var(--stamp));
 }
 
 /* ゾーンの全種類を集めたマス。リセットしても残るので、
    二重線の枠で「確定した」ことが分かるようにしています */
+/* 制覇したマスは、同じ二重線のまま線を太くして区別します */
 .stamp-slot.complete .stamp-ring{
-  border:7px double var(--zone-color, var(--stamp));
+  border:10px double var(--zone-color, var(--stamp));
 }
-.stamp-slot.complete .stamp-ring::after{ display:none; }
 .stamp-done{
   font-size:10px; font-weight:900; line-height:1.6; text-align:center;
-  color:var(--zone-color, var(--stamp));
+  color:var(--zone-text, var(--stamp));
   border:2px solid currentColor; border-radius:999px;
   padding:1px 9px;
 }
@@ -384,7 +390,7 @@ section{ margin-bottom:34px; }
   border:2px solid var(--stamp); color:var(--stamp); background:transparent;
 }
 .zukan-card.cleared .zukan-state{
-  border-color:var(--zone-color); background:var(--zone-color); color:#fff;
+  border-color:var(--zone-text); background:var(--zone-text); color:#fff;
 }
 
 /* ============================================================
@@ -523,16 +529,13 @@ section{ margin-bottom:34px; }
 /* 押印の演出 */
 .press-ring{
   width:min(180px, 52vw); aspect-ratio:1/1; margin:6px auto 12px;
-  border-radius:50%; border:4px solid var(--zone-color, var(--stamp));
+  border-radius:50%; border:7px double var(--zone-color, var(--stamp));
   color:var(--zone-color, var(--stamp));
   background:#fff; overflow:hidden; position:relative;
   display:flex; align-items:center; justify-content:center;
   animation:stamp-press-big .5s cubic-bezier(.2,.9,.3,1);
 }
-.press-ring::after{
-  content:''; position:absolute; inset:8px; border-radius:50%;
-  border:1.5px solid currentColor; opacity:.55;
-}
+/* こちらも内側の円は使いません */
 .press-ring img{ width:100%; height:100%; object-fit:cover; }
 .press-zone{ text-align:center; font-size:12px; font-weight:700; line-height:2; color:var(--ink-2); }
 .press-name{
