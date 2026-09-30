@@ -660,7 +660,71 @@ section{ margin-bottom:34px; }
   font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
   background:var(--paper-sunk); border-radius:4px; padding:1px 5px; font-size:11px;
 }
+/* ------------------------------------------------------------
+   運営パネル：どうぶつの復元
+   データが消えた来園者のぶんを、1体ずつ戻すための一覧です。
+   ------------------------------------------------------------ */
+.admin-section{
+  border-top:2px dashed var(--line);
+  padding-top:13px; margin-top:13px;
+}
+.admin-summary{
+  font-size:14px; font-weight:900; line-height:2;
+  color:var(--ink); cursor:pointer;
+  list-style:none; padding:6px 0;
+  display:flex; align-items:center; gap:8px;
+  min-height:var(--tap);
+}
+.admin-summary::-webkit-details-marker{ display:none; }
+/* 開閉の向きを三角で示します（画像も絵文字も使いません） */
+.admin-summary::before{
+  content:''; flex-shrink:0;
+  width:0; height:0;
+  border-left:7px solid var(--ink-2);
+  border-top:5px solid transparent;
+  border-bottom:5px solid transparent;
+  transition:transform .2s;
+}
+.admin-section[open] .admin-summary::before{ transform:rotate(90deg); }
+
+.restore-zone{ margin-bottom:14px; }
+.restore-zone-name{
+  font-size:12px; font-weight:900; line-height:1.9;
+  color:var(--ink-2);
+  border-bottom:1px solid var(--line);
+  padding-bottom:4px; margin-bottom:7px;
+}
+.restore-list{ display:flex; flex-direction:column; gap:5px; }
+.restore-btn{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  min-height:var(--tap);
+  width:100%; text-align:left;
+  padding:7px 12px; border-radius:var(--radius-sm);
+  border:2px solid var(--line-strong);
+  background:var(--paper-card); color:var(--ink);
+  font-size:12.5px; font-weight:700; line-height:1.8;
+}
+.restore-btn .nm{ flex:1; min-width:0; }
+.restore-btn .st{
+  flex-shrink:0;
+  font-size:10.5px; font-weight:900; line-height:1.7;
+  border-radius:999px; padding:2px 9px;
+  border:2px solid currentColor;
+}
+/* 未取得：うすく */
+.restore-btn.s0{ color:var(--ink-3); border-color:var(--line); }
+/* 図鑑にある：ゾーンの色で縁取り */
+.restore-btn.s1{ color:var(--zone-text, var(--ink)); border-color:currentColor; }
+/* クリア済み：ゾーンの色で塗る */
+.restore-btn.s2{
+  color:#fff;
+  background:var(--zone-text, var(--ink));
+  border-color:var(--zone-text, var(--ink));
+}
+.restore-btn.s2 .st{ border-color:rgba(255,255,255,.7); }
+
 .qr-list{ border-top:2px dashed var(--line); padding-top:13px; margin-top:13px; }
+
 .qr-title{ font-size:14px; font-weight:900; line-height:2; text-align:left; margin-bottom:7px; }
 .qr-row{ display:flex; align-items:center; gap:10px; margin-bottom:11px; }
 .qr-row .qrbox{ width:60px; height:60px; flex-shrink:0; background:#fff; }

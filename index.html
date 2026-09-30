@@ -140,15 +140,27 @@
       ここからスタンプの動きを確認できます。
     </p>
     <div class="admin-grid" id="adminZoneButtons"></div>
-    <div class="btn-row">
-      <button class="btn danger wide" type="button" id="adminReset">全データを消す（図鑑ふくむ）</button>
-    </div>
+
+    <details class="admin-section">
+      <summary class="admin-summary">どうぶつの復元（<span id="restoreCount">—</span>）</summary>
+      <p class="admin-hint">
+        データが消えてしまった来園者のために、集めていたどうぶつを1体ずつ戻せます。
+        ボタンを押すごとに「未取得 → 図鑑にある → クイズもクリア」と切りかわり、
+        もう一度押すと未取得にもどります。押し間違えても戻せます。
+      </p>
+      <div id="restoreList"></div>
+    </details>
+
     <div class="qr-list">
       <h3 class="qr-title">設置用QRコード</h3>
       <p class="admin-hint">
         各ゾーンの看板に設置してください。<code>?zone=ゾーンid</code> が付いたURLです。
       </p>
       <div id="qrList"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn danger wide" type="button" id="adminReset">全データを消す（図鑑ふくむ）</button>
     </div>
   </div>
 </div>

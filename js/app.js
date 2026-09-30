@@ -894,6 +894,66 @@ function buildAdminButtons(){
   });
 }
 
+/* ------------------------------------------------------------
+ * どうぶつの復元（運営用）
+ *   データが消えた来園者のために、1体ずつ状態を戻せるようにします。
+ *   ボタンを押すごとに 未取得 → 図鑑にある → クイズもクリア → 未取得
+ *   と一巡します。押し間違えてももう一度押せば戻せます。
+ * ---------------------------------------------------------- */
+function animalState(id){
+  if(isCleared(id)) return 2;                          /* クイズもクリア */
+  if(state.zukan.indexOf(id) !== -1) return 1;         /* 図鑑にある */
+  return 0;                                            /* 未取得 */
+}
+var RESTORE_LABEL = ['未取得','図鑑にある','クリア済み'];
+
+function cycleAnimal(animal, zone){
+  var s = animalState(animal.id);
+  if(s === 0){
+    state.zukan.push(animal.id);
+    /* 台紙のそのゾーンが空いていれば、あわせて押しておく */
+    if(!state.stamps[zone.id]) state.stamps[zone.id] = animal.id;
+  }else if(s === 1){
+    state.cleared.push(animal.id);
+  }else{
+    state.cleared = state.cleared.filter(function(x){ return x !== animal.id; });
+    state.zukan   = state.zukan.filter(function(x){ return x !== animal.id; });
+    if(state.stamps[zone.id] === animal.id) delete state.stamps[zone.id];
+  }
+  saveState();
+  renderAll();
+  buildRestoreList();
+}
+
+function buildRestoreList(){
+  var wrap = $('restoreList');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  $('restoreCount').textContent = zukanIds().length + ' / ' + zukanTotal();
+
+  ZONES.forEach(function(zone){
+    var box = el('div','restore-zone');
+    box.appendChild(setRuby(el('h4','restore-zone-name'), zone.name));
+
+    var list = el('div','restore-list');
+    zone.animals.forEach(function(animal){
+      var s = animalState(animal.id);
+      var b = el('button','restore-btn s' + s);
+      b.type = 'button';
+      b.style.setProperty('--zone-text', 'var(--zt-' + zone.id + ')');
+      b.innerHTML = '<span class="nm">' + ruby(animal.name) + '</span>' +
+                    '<span class="st">' + escapeHtml(RESTORE_LABEL[s]) + '</span>';
+      b.setAttribute('aria-label', plain(animal.name) + '：' + RESTORE_LABEL[s]);
+      b.addEventListener('click', function(){ cycleAnimal(animal, zone); });
+      list.appendChild(b);
+    });
+
+    box.appendChild(list);
+    wrap.appendChild(box);
+  });
+}
+
 function buildQrList(){
   var base = window.location.origin + window.location.pathname;
   var list = $('qrList');
@@ -992,6 +1052,7 @@ function init(){
   handleIncomingQR();
   renderAll();
   buildAdminButtons();
+  buildRestoreList();
   buildQrList();
   initIntro();
 
