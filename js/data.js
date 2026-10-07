@@ -22,8 +22,15 @@
  *   図鑑・カード絵  img/animal/animal_{id}.jpg          500x500（正方形）
  *   クイズの絵      img/quiz/quiz_{id}_q1.jpg           900x600（横3:2／q1〜q3・任意）
  *   ごほうび画像    img/prize/prize_{id}.png            1200x1200（全問正解の景品）
- *   iPhone用壁紙    phone/iphone/wall_iphone_{id}.png   1170x2532
- *   Android用壁紙   phone/android/wall_android_{id}.png 1080x2400
+ *   スマホの壁紙    phone/{OS}/{種類}/{id}.png
+ *                   OS   … iphone（1170x2532）/ android（1080x2400）
+ *                   種類 … design（デザイン入り）/ photo（写真だけ）
+ *                   フォルダで分けるので、ファイル名はどうぶつidだけです。
+ *                   1頭につき OS2種 x 種類2種 = 4枚になります。
+ *                     phone/iphone/design/asia_01.png
+ *                     phone/iphone/photo/asia_01.png
+ *                     phone/android/design/asia_01.png
+ *                     phone/android/photo/asia_01.png
  *   コンプリート動画 video/movie_complete.mp4           1080x1920（縦）
  *   動画のサムネ     video/movie_complete_poster.jpg    1080x1920
  *   園内マップ       img/img1.jpg                       横長。幅1600px以上
@@ -36,6 +43,30 @@
  *
  *   画像が無い間は、名前を朱書きした代替表示に自動で切り替わります。
  *   （置いた瞬間から画像が出るので、後から差し替えて大丈夫です）
+ *
+ * ------------------------------------------------------------
+ * ■ オス・メスなど、同じ種類で見た目がちがう子がいるとき
+ *   そのどうぶつに forms を書くと、出会ったときにどちらかが
+ *   ランダムで決まり、以後その子で固定されます。
+ *
+ *     forms: [
+ *       { id:'male',   label:'オス' },
+ *       { id:'female', label:'メス' }
+ *     ],
+ *
+ *   ★ここには「絵が用意できているパターンだけ」を並べてください。
+ *     絵がオスしか無いなら male だけ書けば、オスしか出ません。
+ *     1つだけ書いても構いませんし、いくつ増やしても構いません。
+ *     forms を書かなければ、これまでどおり1種類だけです。
+ *
+ *   このとき、ファイル名の id の後ろに個体idが付きます。
+ *     img/animal/animal_africa_11_male.jpg
+ *     img/animal/animal_africa_11_female.jpg
+ *     img/prize/prize_africa_11_male.png
+ *     phone/iphone/design/africa_11_male.png
+ *   （クイズの絵は種そのものの話なので、個体では分けません）
+ *
+ *   forms を書かないどうぶつは、これまでどおり1種類だけです。
  *
  * ------------------------------------------------------------
  * ■ どうぶつを増やすとき
@@ -67,10 +98,13 @@
 
 window.PUZOOLE_DATA = {
 
-  /* コンプリートしたときに流す動画（全ゾーン共通で1本） */
+  /* コンプリートしたときに流す動画（全ゾーン共通で1本）
+     enabled を false にしているあいだ、ごほうび欄に動画は出ません。
+     また出したくなったら true に戻すだけでそのまま復活します。 */
   video: {
-    src:    'video/movie_complete.mp4',//動画
-    poster: 'video/movie_complete_poster.jpg'//サムネ
+    enabled: false,
+    src:    'video/movie_complete.mp4',   // 動画
+    poster: 'video/movie_complete_poster.jpg'  // サムネ
   },
 
   zones: [
@@ -457,6 +491,13 @@ window.PUZOOLE_DATA = {
         {
           id: 'africa_11',
           name: 'ライオン',
+          /* 絵が用意できているパターンだけを並べます。
+             出会ったときにこの中から1つ抽選され、以後その子で固定されます。
+             絵がオスしか無いなら male だけ書けば、オスしか出ません。 */
+          forms: [
+            { id:'male',   label:'オス' },
+            { id:'female', label:'メス' }
+          ],
           sub: 'ネコの{仲間|なかま}',
           place: 'カバ・ライオン{館|かん}',
           habitat: 'アフリカの{草原|そうげん}',

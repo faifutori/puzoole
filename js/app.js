@@ -65,9 +65,16 @@ var PATH = {
   /* スタンプ絵はゾーンごとに1枚。どうぶつごとではありません */
   stamp:  function(zoneId){ return 'img/stamp/stamp_' + zoneId + '.png'; },
   animal: function(id){ return 'img/animal/animal_' + id + '.jpg'; },
+  /* クイズの絵は種そのものの話なので、個体では分けません */
   quiz:   function(id, n){ return 'img/quiz/quiz_' + id + '_q' + n + '.jpg'; },
   prize:  function(id){ return 'img/prize/prize_' + id + '.png'; },
-  wall:   function(id, os){ return 'phone/' + os + '/wall_' + os + '_' + id + '.png'; }
+  /* 壁紙は フォルダで OS と 種類 を分け、ファイル名はどうぶつidだけにします。
+     1フォルダあたりの枚数が減るので、素材の管理がしやすくなります。
+       phone/iphone/design/asia_01.png
+       phone/android/photo/africa_11_male.png */
+  wall:   function(id, os, kind){
+    return 'phone/' + os + '/' + kind + '/' + id + '.png';
+  }
 };
 
 /* ============================================================
@@ -148,9 +155,14 @@ function zoneOfAnimal(animalId){
  *   stamps:  いまの台紙 { ゾーンid: どうぶつid }
  *            リセットで消えます。ただしゾーンの全種類を集めたゾーンは
  *            もう引ける相手がいないので、押したまま固定します
- *   wall:    壁紙にえらばれているどうぶつid / os: 'iphone' | 'android'
+ *   wall:    壁紙にえらばれているどうぶつid
+ *   os:      'iphone' | 'android'
+ *   kind:    'design'（デザイン入り）| 'photo'（写真だけ）
+ *   forms:   オス・メスなど複数の個体がいるどうぶつで、どの子に会ったか。
+ *            { どうぶつid: 個体id }。一度決まったら変わりません
  * ============================================================ */
-var state = { zukan:[], stamps:{}, cleared:[], wall:null, os:'iphone', intro:false };
+var state = { zukan:[], stamps:{}, cleared:[], wall:null,
+              os:'iphone', kind:'design', forms:{}, intro:false };
 
 function loadState(){
   try{
@@ -174,6 +186,8 @@ function loadState(){
       });
       state.wall    = findAnimal(raw.wall) ? raw.wall : null;
       state.os      = raw.os === 'android' ? 'android' : 'iphone';
+      state.kind    = raw.kind === 'photo' ? 'photo' : 'design';
+      state.forms   = (raw.forms && typeof raw.forms === 'object') ? raw.forms : {};
       state.intro   = !!raw.intro;
     }
   }catch(e){ /* 壊れていたら初期状態のまま進める */ }
@@ -181,6 +195,31 @@ function loadState(){
 function saveState(){
   try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
 }
+/* ------------------------------------------------------------
+ * 個体（オス・メスなど）
+ *   data.js の forms に複数書いてあるどうぶつは、出会ったときに
+ *   どの子だったかを1回だけ抽選して覚えます。以後その子で固定され、
+ *   図鑑の絵・景品・壁紙がその個体のものになります。
+ *   forms が無いどうぶつは、これまでどおり1種類だけです。
+ * ---------------------------------------------------------- */
+function assignForm(animal){
+  if(!animal.forms || !animal.forms.length) return;
+  if(state.forms[animal.id]) return;                 /* すでに決まっている */
+  state.forms[animal.id] = pickRandom(animal.forms).id;
+}
+/* 画像ファイル名に使う id。個体がいる場合は後ろに付きます */
+function assetId(animalId){
+  var f = state.forms[animalId];
+  return f ? animalId + '_' + f : animalId;
+}
+/* 画面に出す名前。個体がいる場合は「ライオン（メス）」のようになります */
+function animalLabel(animal){
+  var fid = state.forms[animal.id];
+  if(!fid || !animal.forms) return animal.name;
+  var f = animal.forms.filter(function(x){ return x.id === fid; })[0];
+  return f ? animal.name + '（' + f.label + '）' : animal.name;
+}
+
 /* いま台紙に押してあるどうぶつ */
 function collectedIds(){
   return ZONES.map(function(z){ return state.stamps[z.id]; })
@@ -268,7 +307,7 @@ function renderSheet(){
     slot.appendChild(ring);
 
     slot.appendChild(setRuby(el('span','stamp-label'), zone.name));
-    if(animal) slot.appendChild(setRuby(el('span','stamp-name'), animal.name));
+    if(animal) slot.appendChild(setRuby(el('span','stamp-name'), animalLabel(animal)));
     if(done) slot.appendChild(setRuby(el('span','stamp-done'),
       'ぜんぶ{集|あつ}めた'));
 
@@ -314,12 +353,12 @@ function renderZukan(){
 
     var thumb = el('div','zukan-thumb');
     thumb.appendChild(imgOrFallback(
-      PATH.animal(animal.id), plain(animal.name),
+      PATH.animal(assetId(animal.id)), plain(animal.name),
       function(){ return zukanAlt(animal); }
     ));
     hit.appendChild(thumb);
 
-    hit.appendChild(setRuby(el('span','zukan-name'), animal.name));
+    hit.appendChild(setRuby(el('span','zukan-name'), animalLabel(animal)));
     hit.appendChild(setRuby(el('span','zukan-zone'), zone.name));
     hit.appendChild(el('span','zukan-state',
       escapeHtml(cleared ? 'クリア' : 'クイズにちょうせん')));
@@ -342,15 +381,16 @@ function renderReward(){
     var left = ZONES.length - collectedIds().length;
     box.appendChild(setRuby(el('h2','reward-title'), 'あと ' + left + ' {個|こ}'));
     box.appendChild(setRuby(el('p','reward-lead'),
-      'スタンプが{全部|ぜんぶ}そろうと、{動画|どうが}とスマホの{壁紙|かべがみ}がもらえます。'));
+      'スタンプが{全部|ぜんぶ}そろうと、スマホの{壁紙|かべがみ}がもらえます。'));
     return;
   }
 
   box.appendChild(setRuby(el('h2','reward-title'), 'スタンプ{全部|ぜんぶ}あつまりました'));
   box.appendChild(setRuby(el('p','reward-lead'),
-    '{記念|きねん}の{動画|どうが}と、スマホの{壁紙|かべがみ}をどうぞ。'));
+    '{記念|きねん}に、スマホの{壁紙|かべがみ}をどうぞ。'));
 
-  /* --- 動画 --- */
+  /* --- 動画（data.js の video.enabled が true のときだけ出します） --- */
+  if(DATA.video && DATA.video.enabled){
   var vBlock = el('div','reward-block');
   vBlock.appendChild(setRuby(el('h3'), '{記念|きねん}の{動画|どうが}'));
   var vFrame = el('div','video-frame');
@@ -366,6 +406,7 @@ function renderReward(){
   vFrame.appendChild(video);
   vBlock.appendChild(vFrame);
   box.appendChild(vBlock);
+  }
 
   /* --- 壁紙 --- */
   var wBlock = el('div','reward-block');
@@ -383,6 +424,20 @@ function renderReward(){
     sw.appendChild(b);
   });
   wBlock.appendChild(sw);
+
+  /* 壁紙の種類（デザイン入り／写真だけ） */
+  var kw = el('div','os-switch');
+  [['design','デザイン'],['photo','{写真|しゃしん}だけ']].forEach(function(pair){
+    var b = el('button','os-btn');
+    b.type = 'button';
+    setRuby(b, pair[1]);
+    b.setAttribute('aria-pressed', String(state.kind === pair[0]));
+    b.addEventListener('click', function(){
+      state.kind = pair[0]; saveState(); renderReward();
+    });
+    kw.appendChild(b);
+  });
+  wBlock.appendChild(kw);
 
   var wallSlot = el('div');
   wallSlot.id = 'wallSlot';
@@ -431,13 +486,16 @@ function renderWallpaper(){
 
   var animal = findAnimal(state.wall);
   var zone   = zoneOfAnimal(state.wall);
-  var src    = PATH.wall(animal.id, state.os);
+  var src    = PATH.wall(assetId(animal.id), state.os, state.kind);
 
   var row = el('div','wall-row');
 
   var preview = el('div','wall-preview');
   var dl = el('a','btn wide');
-  dl.setAttribute('download', src.split('/').pop());
+  /* 保存先では「asia_01.png」だと何の画像か分からないので、
+     ダウンロードするときだけ分かりやすい名前に変えます */
+  dl.setAttribute('download',
+    'puzoole_' + assetId(animal.id) + '_' + state.os + '_' + state.kind + '.png');
   dl.href = src;
   setRuby(dl, 'この{壁紙|かべがみ}をダウンロード');
 
@@ -454,8 +512,10 @@ function renderWallpaper(){
 
   var info = el('div','wall-info');
   var who = el('div','wall-who');
-  who.innerHTML = '<span class="rb">' + ruby(animal.name) + '</span>' +
-    '<small>' + ruby(zone.name) + ' ／ ' + (state.os === 'iphone' ? 'iPhone' : 'Android') + '</small>';
+  who.innerHTML = '<span class="rb">' + ruby(animalLabel(animal)) + '</span>' +
+    '<small>' + ruby(zone.name) + ' ／ ' +
+    (state.os === 'iphone' ? 'iPhone' : 'Android') + ' ／ ' +
+    (state.kind === 'design' ? 'デザイン' : '写真だけ') + '</small>';
   info.appendChild(who);
   info.appendChild(setRuby(el('p','section-note'),
     'あつめたどうぶつの{中|なか}から、1{頭|とう}えらばれています。'));
@@ -468,6 +528,11 @@ function renderWallpaper(){
   re.addEventListener('click', rerollWall);
   btns.appendChild(re);
   info.appendChild(btns);
+
+  /* 壁紙は大きい画像なので、保存に時間がかかることを先に伝えます */
+  info.appendChild(setRuby(el('p','dl-note'),
+    '{画像|がぞう}が{大|おお}きいので、ダウンロードに{少|すこ}し{時間|じかん}がかかります。' +
+    'とちゅうで{画面|がめん}をとじないでね。'));
 
   row.appendChild(info);
   slot.appendChild(row);
@@ -561,6 +626,7 @@ function pressStamp(zoneId){
      そのゾーンで会ったことのある子を1頭えらんで押しなおす */
   if(!remaining.length){
     var again = pickRandom(zone.animals);
+    assignForm(again);
     state.stamps[zone.id] = again.id;
     justPressed = zone.id;
     saveState();
@@ -573,6 +639,7 @@ function pressStamp(zoneId){
   }
 
   var animal = pickRandom(remaining);
+  assignForm(animal);
   state.stamps[zone.id] = animal.id;
   state.zukan.push(animal.id);
   justPressed = zone.id;
@@ -598,13 +665,13 @@ function showPress(zone, animal){
   ring.style.setProperty('--zone-color', zone.color);
   ring.style.setProperty('--zone-text', 'var(--zt-' + zone.id + ')');
   ring.appendChild(imgOrFallback(
-    PATH.animal(animal.id), plain(animal.name),
+    PATH.animal(assetId(animal.id)), plain(animal.name),
     function(){ return stampAlt(animal.name); }
   ));
   body.appendChild(ring);
 
   body.appendChild(setRuby(el('div','press-zone'), zone.name));
-  body.appendChild(setRuby(el('div','press-name'), animal.name));
+  body.appendChild(setRuby(el('div','press-name'), animalLabel(animal)));
 
   var row = el('div','btn-row');
   var quizBtn = el('button','btn wide');
@@ -647,12 +714,12 @@ function showCard(animalId){
   var zone   = zoneOfAnimal(animalId);
   var body   = openSheet(false);
 
-  body.appendChild(setRuby(el('h2'), animal.name));
+  body.appendChild(setRuby(el('h2'), animalLabel(animal)));
   body.appendChild(setRuby(el('p','lead'), zone.name + '　' + animal.sub));
 
   var frame = el('div','prize-frame');
   frame.appendChild(imgOrFallback(
-    PATH.animal(animal.id), plain(animal.name),
+    PATH.animal(assetId(animal.id)), plain(animal.name),
     function(){ return zukanAlt(animal); }
   ));
   body.appendChild(frame);
@@ -693,7 +760,7 @@ function buildKeeper(animal){
 /* ごほうび画像。ファイルが無いときはブロックごと消える */
 function buildPrize(animal){
   var block = el('div','reward-block');
-  var src   = PATH.prize(animal.id);
+  var src   = PATH.prize(assetId(animal.id));
 
   var frame = el('div','prize-frame');
   var img = document.createElement('img');
@@ -710,6 +777,8 @@ function buildPrize(animal){
   block.appendChild(setRuby(el('h3'), 'ぜんもん{正解|せいかい}のごほうび'));
   block.appendChild(frame);
   block.appendChild(dl);
+  block.appendChild(setRuby(el('p','dl-note'),
+    '{画像|がぞう}が{大|おお}きいので、ダウンロードに{少|すこ}し{時間|じかん}がかかります。'));
   return block;
 }
 
@@ -910,6 +979,7 @@ var RESTORE_LABEL = ['未取得','図鑑にある','クリア済み'];
 function cycleAnimal(animal, zone){
   var s = animalState(animal.id);
   if(s === 0){
+    assignForm(animal);
     state.zukan.push(animal.id);
     /* 台紙のそのゾーンが空いていれば、あわせて押しておく */
     if(!state.stamps[zone.id]) state.stamps[zone.id] = animal.id;
@@ -918,6 +988,7 @@ function cycleAnimal(animal, zone){
   }else{
     state.cleared = state.cleared.filter(function(x){ return x !== animal.id; });
     state.zukan   = state.zukan.filter(function(x){ return x !== animal.id; });
+    delete state.forms[animal.id];   /* 未取得に戻すので個体も忘れる */
     if(state.stamps[zone.id] === animal.id) delete state.stamps[zone.id];
   }
   saveState();
