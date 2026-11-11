@@ -27,17 +27,17 @@
  *                   種類 … design（デザイン入り）/ photo（写真だけ）
  *                   フォルダで分けるので、ファイル名はどうぶつidだけです。
  *                   1頭につき OS2種 x 種類2種 = 4枚になります。
- *                     phone/iphone/design/asia_01.png
- *                     phone/iphone/photo/asia_01.png
- *                     phone/android/design/asia_01.png
- *                     phone/android/photo/asia_01.png
+ *                     phone/iphone/design/asia_02.png
+ *                     phone/iphone/photo/asia_02.png
+ *                     phone/android/design/asia_02.png
+ *                     phone/android/photo/asia_02.png
  *   コンプリート動画 video/movie_complete.mp4           1080x1920（縦）
  *   動画のサムネ     video/movie_complete_poster.jpg    1080x1920
  *   園内マップ       img/img1.jpg                       横長。幅1600px以上
  *
- *   例：コツメカワウソ（id: asia_01）なら
- *       img/animal/animal_asia_01.jpg
- *       phone/iphone/wall_iphone_asia_01.png
+ *   例：シシオザル（id: asia_02）なら
+ *       img/animal/animal_asia_02.jpg
+ *       phone/iphone/photo/asia_02.png
  *
  *   ゾーンid： asia / africa / elephant / polarbear / monkey / kodomo
  *
@@ -117,23 +117,9 @@ window.PUZOOLE_DATA = {
       name: 'アジアゾーン',
       color: 'var(--z-asia)',
       animals: [
-        {
-          id: 'asia_01',
-          name: 'コツメカワウソ',
-          sub: 'イタチの{仲間|なかま}',
-          place: '{熱帯雨林館|ねったいうりんかん}',
-          habitat: '{東南|とうなん}アジアや{南|みなみ}アジアの{川|かわ}や{湿地|しっち}',
-          feature: '{世界|せかい}でいちばん{小|ちい}さなカワウソ。{手先|てさき}がとても{器用|きよう}です。',
-          keeper: '{指先|ゆびさき}をつかって{石|いし}や{貝|かい}をつまむのが{得意|とくい}で、{小|ちい}さな{道具|どうぐ}のように{使|つか}うこともあります。{鳴|な}き{声|ごえ}の{種類|しゅるい}がとても{多|おお}く、{仲間|なかま}どうしでおしゃべりするように{鳴|な}きかわします。',
-          quiz: [
-            { q:'コツメカワウソは、カワウソの{仲間|なかま}のなかでどんな{大|おお}きさ？',
-              c:['{世界|せかい}でいちばん{小|ちい}さい','{世界|せかい}でいちばん{大|おお}きい','ホッキョクグマくらい'], a:0,
-              e:'{体重|たいじゅう}は5キロほどで、カワウソの{仲間|なかま}ではいちばん{小|ちい}さい{種類|しゅるい}です。' },
-            { q:'「コツメ」という{名前|なまえ}は、{何|なに}をあらわしている？',
-              c:['つめが{小|ちい}さいこと','つめが5{本|ほん}あること','{小|ちい}さな{爪|つめ}あとをつけること'], a:0,
-              e:'「{小爪|こづめ}」と{書|か}きます。{指|ゆび}のさきのつめがとても{小|ちい}さく、{指先|ゆびさき}のほうがよく{出|で}ています。' }
-          ]
-        },
+        /* asia_01 コツメカワウソ は、個体が亡くなったため取りさげました。
+           id は欠番のままにしてあります。詰めて振りなおすと、
+           ほかのどうぶつの画像・壁紙のファイル名が全部ずれます。 */
         {
           id: 'asia_02',
           name: 'シシオザル',

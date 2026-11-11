@@ -70,7 +70,7 @@ var PATH = {
   prize:  function(id){ return 'img/prize/prize_' + id + '.png'; },
   /* 壁紙は フォルダで OS と 種類 を分け、ファイル名はどうぶつidだけにします。
      1フォルダあたりの枚数が減るので、素材の管理がしやすくなります。
-       phone/iphone/design/asia_01.png
+       phone/iphone/design/asia_02.png
        phone/android/photo/africa_11_male.png */
   wall:   function(id, os, kind){
     return 'phone/' + os + '/' + kind + '/' + id + '.png';
@@ -492,7 +492,7 @@ function renderWallpaper(){
 
   var preview = el('div','wall-preview');
   var dl = el('a','btn wide');
-  /* 保存先では「asia_01.png」だと何の画像か分からないので、
+  /* 保存先では「asia_02.png」だと何の画像か分からないので、
      ダウンロードするときだけ分かりやすい名前に変えます */
   dl.setAttribute('download',
     'puzoole_' + assetId(animal.id) + '_' + state.os + '_' + state.kind + '.png');
@@ -735,7 +735,8 @@ function showCard(animalId){
   });
   body.appendChild(facts);
 
-  body.appendChild(buildKeeper(animal));
+  var keeper = buildKeeper(animal);
+  if(keeper) body.appendChild(keeper);
   body.appendChild(buildPrize(animal));
 
   var row = el('div','btn-row');
@@ -747,7 +748,10 @@ function showCard(animalId){
   body.appendChild(row);
 }
 
+/* 飼育員さんの言葉。園から文章をいただけていないどうぶつは
+   枠ごと出しません（空の吹き出しが出ないようにします）。 */
 function buildKeeper(animal){
+  if(!animal.keeper || !String(animal.keeper).trim()) return null;
   var box  = el('div','keeper');
   var head = el('div','keeper-head');
   head.appendChild(el('span','mark', MARK_TALK));
