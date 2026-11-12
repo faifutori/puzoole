@@ -487,6 +487,11 @@ function renderWallpaper(){
   var animal = findAnimal(state.wall);
   var zone   = zoneOfAnimal(state.wall);
   var src    = PATH.wall(assetId(animal.id), state.os, state.kind);
+  /* ゾーンに1枚だけ用意してある壁紙です。
+     どうぶつごとの絵がまだないときは、こちらに切りかわります。
+     あとから phone/{OS}/{種類}/{どうぶつid}.png を置けば、
+     何も直さなくても、そちらが優先されます。 */
+  var zoneSrc = PATH.wall(zone.id, state.os, state.kind);
 
   var row = el('div','wall-row');
 
@@ -501,7 +506,17 @@ function renderWallpaper(){
 
   var img = document.createElement('img');
   img.alt = plain(animal.name) + 'の壁紙';
+  var usedZone = false;
   img.addEventListener('error', function(){
+    /* どうぶつごとの絵がなければ、ゾーンの1枚に切りかえます */
+    if(!usedZone && zoneSrc !== src){
+      usedZone = true;
+      dl.href = zoneSrc;
+      dl.setAttribute('download',
+        'puzoole_' + zone.id + '_' + state.os + '_' + state.kind + '.png');
+      img.src = zoneSrc;
+      return;
+    }
     preview.innerHTML = '';
     preview.appendChild(missingNote(src));
     dl.remove();
