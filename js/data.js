@@ -33,7 +33,7 @@
  *                     phone/android/photo/asia_02.png
  *   コンプリート動画 video/movie_complete.mp4           1080x1920（縦）
  *   動画のサムネ     video/movie_complete_poster.jpg    1080x1920
- *   園内マップ       img/img1.jpg                       横長。幅1600px以上
+ *   コラボポスター   img/poster.png                     横長。印刷するチラシと同じ絵
  *
  *   例：シシオザル（id: asia_02）なら
  *       img/animal/animal_asia_02.jpg
