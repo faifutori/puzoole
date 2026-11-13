@@ -143,6 +143,14 @@ section{ margin-bottom:34px; }
   font-weight:500;
   margin:10px 0 16px;
 }
+/* 本文に添える、小さなことわり書き（※ではじまる一文） */
+.note-small{
+  color:var(--ink-3);
+  font-size:11.5px;
+  line-height:1.95;
+  font-weight:500;
+  margin:-8px 0 16px;
+}
 
 /* ============================================================
    開催のご案内

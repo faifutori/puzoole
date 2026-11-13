@@ -15,7 +15,7 @@
      これが無いと、一度開いたことのある人のブラウザが前のCSSやJSを使い続け、
      直したはずの見た目や中身が反映されません。
      css や js を直したら、ここの日付を必ず新しくしてください（3か所とも同じ値に）。 -->
-<link rel="stylesheet" href="css/puzoole.css?v=20261113a">
+<link rel="stylesheet" href="css/puzoole.css?v=20261113b">
 </head>
 <body>
 
@@ -119,6 +119,12 @@
       はじめは<ruby>白黒<rt>しろくろ</rt></ruby>ですが、タップしてクイズに<ruby>全問正解<rt>ぜんもんせいかい</rt></ruby>すると<ruby>色<rt>いろ</rt></ruby>がつき、
       <ruby>記念<rt>きねん</rt></ruby>の<ruby>画像<rt>がぞう</rt></ruby>と<ruby>飼育員<rt>しいくいん</rt></ruby>さんのお<ruby>話<rt>はなし</rt></ruby>が<ruby>読<rt>よ</rt></ruby>めます。
     </p>
+    <!-- クイズの数は、園に見ていただけた問題の数によって変わります。
+         0問の子はタップした時点で色がつきます。 -->
+    <p class="note-small">
+      ※クイズの<ruby>数<rt>かず</rt></ruby>は、どうぶつによって2<ruby>問<rt>もん</rt></ruby>・1<ruby>問<rt>もん</rt></ruby>・0<ruby>問<rt>もん</rt></ruby>とちがいます。
+      クイズのないどうぶつは、タップするとそのまま<ruby>色<rt>いろ</rt></ruby>がつきます。
+    </p>
     <p class="zukan-count" id="zukanCount"></p>
     <div class="zukan-grid" id="zukanGrid"></div>
   </section>
@@ -207,7 +213,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/data.js?v=20261113a"></script>
-<script src="js/app.js?v=20261113a"></script>
+<script src="js/data.js?v=20261113b"></script>
+<script src="js/app.js?v=20261113b"></script>
 </body>
 </html>
