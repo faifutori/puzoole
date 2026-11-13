@@ -145,6 +145,65 @@ section{ margin-bottom:34px; }
 }
 
 /* ============================================================
+   開催のご案内
+   動物園のウェブサイトから先に見にきた人むけ。
+   日時とあそびかたを、スタンプ台紙より先に出します。
+   ============================================================ */
+.event-note{
+  border:1px solid var(--line-strong);
+  border-radius:var(--radius);
+  background:var(--paper-card);
+  padding:15px 16px 16px;
+  margin-bottom:26px;
+}
+.event-title{
+  font-family:var(--font-display);
+  font-size:15px;
+  line-height:1.9;
+  color:var(--ink);
+  padding-bottom:7px;
+  border-bottom:2px solid var(--line);
+  margin-bottom:12px;
+}
+.event-date{
+  font-family:var(--font-display);
+  font-size:16px;
+  line-height:1.8;
+  color:var(--stamp);
+  margin-bottom:9px;
+}
+.event-body{
+  font-size:13px;
+  line-height:2.1;
+  font-weight:500;
+  color:var(--ink);
+  margin-bottom:11px;
+}
+.event-list{
+  list-style:none;
+  border-top:1px solid var(--line);
+  padding-top:10px;
+}
+.event-list li{
+  position:relative;
+  padding-left:14px;
+  font-size:12.5px;
+  line-height:2;
+  font-weight:500;
+  color:var(--ink-2);
+}
+.event-list li::before{
+  content:'';
+  position:absolute;
+  left:2px;
+  top:calc(1em - 1px);
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--line-strong);
+}
+
+/* ============================================================
    アプリの中のブラウザ（WebView）への注意書き
    QRコードリーダーアプリで開かれたときだけ出ます。
    ============================================================ */
