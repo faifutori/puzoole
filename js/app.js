@@ -349,7 +349,8 @@ function renderZukan(){
 
     var hit = el('button','zukan-hit');
     hit.type = 'button';
-    hit.setAttribute('aria-label', plain(animal.name) + 'のクイズをひらく');
+    hit.setAttribute('aria-label', plain(animal.name) +
+      (hasQuiz(animal) ? 'のクイズをひらく' : 'の図鑑カードをひらく'));
 
     var thumb = el('div','zukan-thumb');
     thumb.appendChild(imgOrFallback(
@@ -361,7 +362,8 @@ function renderZukan(){
     hit.appendChild(setRuby(el('span','zukan-name'), animalLabel(animal)));
     hit.appendChild(setRuby(el('span','zukan-zone'), zone.name));
     hit.appendChild(el('span','zukan-state',
-      escapeHtml(cleared ? 'クリア' : 'クイズにちょうせん')));
+      escapeHtml(cleared ? 'クリア'
+                         : (hasQuiz(animal) ? 'クイズにちょうせん' : 'カードを見る'))));
 
     hit.addEventListener('click', function(){ openAnimal(animal.id); });
 
@@ -691,8 +693,9 @@ function showPress(zone, animal){
   var row = el('div','btn-row');
   var quizBtn = el('button','btn wide');
   quizBtn.type = 'button';
-  setRuby(quizBtn, 'クイズにちょうせんする');
-  quizBtn.addEventListener('click', function(){ openQuiz(animal.id); });
+  /* クイズのない子は、そのまま図鑑のカードへ進みます */
+  setRuby(quizBtn, hasQuiz(animal) ? 'クイズにちょうせんする' : '{図鑑|ずかん}で{見|み}る');
+  quizBtn.addEventListener('click', function(){ openAnimal(animal.id); });
   row.appendChild(quizBtn);
 
   var later = el('button','btn ghost wide');
@@ -719,7 +722,26 @@ function showPress(zone, animal){
 /* ============================================================
  * 図鑑カード：クリア済みならカード、まだならクイズへ
  * ============================================================ */
+
+/* クイズのないどうぶつ。
+   園に見ていただいた問題がそろわなかった数種は quiz: [] にしてあります。
+   その子はタップした時点で色がつき、記念の画像と飼育員さんの言葉が
+   すぐ読めます。あとで data.js に問題を書き足せば、何も直さなくても
+   ふつうのクイズつきにもどります。 */
+function hasQuiz(animal){
+  return !!(animal && animal.quiz && animal.quiz.length);
+}
+
+/* クイズのない子を、クリア済みとして記録する */
+function clearWithoutQuiz(animalId){
+  if(isCleared(animalId)) return;
+  state.cleared.push(animalId);
+  saveState();
+  renderZukan();
+}
+
 function openAnimal(animalId){
+  if(!hasQuiz(findAnimal(animalId))) clearWithoutQuiz(animalId);
   if(isCleared(animalId)) showCard(animalId);
   else openQuiz(animalId);
 }
@@ -754,13 +776,16 @@ function showCard(animalId){
   if(keeper) body.appendChild(keeper);
   body.appendChild(buildPrize(animal));
 
-  var row = el('div','btn-row');
-  var again = el('button','btn ghost wide');
-  again.type = 'button';
-  setRuby(again, 'クイズをもういちどやる');
-  again.addEventListener('click', function(){ openQuiz(animal.id); });
-  row.appendChild(again);
-  body.appendChild(row);
+  /* クイズのない子には「もういちど」のボタンを出しません */
+  if(hasQuiz(animal)){
+    var row = el('div','btn-row');
+    var again = el('button','btn ghost wide');
+    again.type = 'button';
+    setRuby(again, 'クイズをもういちどやる');
+    again.addEventListener('click', function(){ openQuiz(animal.id); });
+    row.appendChild(again);
+    body.appendChild(row);
+  }
 }
 
 /* 飼育員さんの言葉。園から文章をいただけていないどうぶつは
