@@ -145,6 +145,42 @@ section{ margin-bottom:34px; }
 }
 
 /* ============================================================
+   アプリの中のブラウザ（WebView）への注意書き
+   QRコードリーダーアプリで開かれたときだけ出ます。
+   ============================================================ */
+.wv-note{
+  border:2px solid var(--stamp);
+  border-radius:var(--radius);
+  background:var(--paper-card);
+  padding:14px 15px 15px;
+  margin-bottom:24px;
+}
+.wv-lead{
+  font-family:var(--font-display);
+  font-size:14px;
+  line-height:1.9;
+  color:var(--stamp);
+  margin-bottom:7px;
+}
+.wv-body{
+  font-size:13px;
+  line-height:2.1;
+  font-weight:500;
+  color:var(--ink);
+}
+.wv-url{
+  margin:12px 0;
+  padding:9px 10px;
+  border:1px solid var(--line);
+  border-radius:var(--radius-sm);
+  background:var(--paper-sunk);
+  font-size:12px;
+  line-height:1.8;
+  color:var(--ink-2);
+  word-break:break-all;
+}
+
+/* ============================================================
    ヘッダー
    ============================================================ */
 .site-header{

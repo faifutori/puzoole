@@ -1109,9 +1109,72 @@ function guardImages(){
 }
 
 /* ============================================================
+ * アプリの中のブラウザ（WebView）への注意
+ *
+ *   QRコードリーダーアプリは、読みとったページを「アプリの中の
+ *   ブラウザ」で開きます。そこは記録のしまい場所がSafariやChromeとは
+ *   別で、しかもスキャンのたびに作りなおされることがあります。
+ *   すると次のQRコードを読んだときに、集めたどうぶつが消えて
+ *   最初からになってしまいます。
+ *
+ *   これはこちらのコードでは直せません（ブラウザの外側の話です）。
+ *   そこで、気づけるようにして、ふだんのブラウザへ移る道をつくります。
+ *   スマホのカメラで読みとった人はSafariで開くので、ここは出ません。
+ * ============================================================ */
+function inAppBrowser(){
+  var ua = navigator.userAgent || '';
+
+  /* 保存そのものが使えないとき（プライベートモードなど）も同じ扱い */
+  try{
+    localStorage.setItem('puzoole_probe', '1');
+    localStorage.removeItem('puzoole_probe');
+  }catch(e){ return true; }
+
+  if(/; wv\)/.test(ua)) return true;                  /* AndroidのWebView */
+  if(/(Line|FBAN|FBAV|FBIOS|Instagram|MicroMessenger|KAKAOTALK)/i.test(ua)) return true;
+
+  /* iOSのWebViewは、Safariと違って UA に「Safari/」を書きません。
+     iOS版のChromeやFirefoxは書くので、ここには入りません。 */
+  if(/iPhone|iPad|iPod/.test(ua) && !/Safari\//.test(ua)) return true;
+
+  return false;
+}
+
+function showWebviewNote(openedUrl){
+  if(!inAppBrowser()) return;
+
+  setRuby($('wvLead'), 'アプリの{中|なか}のブラウザで{開|ひら}かれています');
+  setRuby($('wvBody'),
+    'このままでも{遊|あそ}べますが、{次|つぎ}のQRコードを{読|よ}んだときに、' +
+    '{集|あつ}めたどうぶつが{消|き}えてしまうことがあります。' +
+    'スマホのカメラで{読|よ}みとるか、{下|した}のリンクをSafariやChromeで' +
+    '{開|ひら}いてね。そうすれば{記録|きろく}がのこります。');
+  $('wvUrl').textContent = openedUrl;
+
+  var copy = $('wvCopy');
+  copy.addEventListener('click', function(){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(openedUrl).then(function(){
+        toast('リンクをコピーしました');
+      }, function(){
+        toast('コピーできませんでした。上の文字を長おしして選んでね');
+      });
+    }else{
+      toast('上の文字を長おしして選んでね');
+    }
+  });
+
+  $('wvNote').hidden = false;
+}
+
+/* ============================================================
  * 初期化
  * ============================================================ */
 function init(){
+  /* QRコードのパラメータを外す前に、読みとったURLを控えておきます。
+     ブラウザで開きなおしてもらうときに、そのまま渡せるようにです。 */
+  var openedUrl = window.location.href;
+
   loadState();
   guardImages();
 
@@ -1139,6 +1202,7 @@ function init(){
   });
   $('adminReset').addEventListener('click', doFullReset);
 
+  showWebviewNote(openedUrl);
   handleIncomingQR();
   renderAll();
   buildAdminButtons();

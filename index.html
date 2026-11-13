@@ -26,6 +26,18 @@
     </p>
   </header>
 
+  <!-- アプリの中のブラウザで開かれたときだけ出る注意書きです。
+       QRコードリーダーアプリは、記録の保存先がSafariやChromeと別で、
+       次のQRコードを読むと集めたどうぶつが消えてしまうことがあります。 -->
+  <div class="wv-note" id="wvNote" hidden role="alert">
+    <p class="wv-lead" id="wvLead"></p>
+    <p class="wv-body" id="wvBody"></p>
+    <p class="wv-url" id="wvUrl"></p>
+    <div class="btn-row">
+      <button class="btn wide" type="button" id="wvCopy">リンクをコピー</button>
+    </div>
+  </div>
+
   <div class="progress">
     <div class="progress-track" id="progressTrack" aria-hidden="true"></div>
     <p class="progress-text" id="progressText">0 / 6</p>
