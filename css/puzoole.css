@@ -192,24 +192,47 @@ section{ margin-bottom:34px; }
   border:2px solid var(--stamp);
   border-radius:var(--radius);
   background:var(--paper-card);
-  padding:14px 15px 15px;
-  margin-bottom:24px;
+  padding:12px 13px 13px;
+  margin-bottom:20px;
 }
+.wv-more{
+  margin-bottom:11px;
+}
+/* 見出しの行そのものが「くわしく」の開け閉めになります。
+   標準の三角印は大きさがブラウザごとにまちまちなので消して、
+   右はしに ＋ と − を置いています。 */
+.wv-more > summary{
+  display:block;
+  list-style:none;
+  position:relative;
+  padding-right:20px;
+  cursor:pointer;
+}
+.wv-more > summary::-webkit-details-marker{ display:none; }
+.wv-more > summary::after{
+  content:'＋';
+  position:absolute;
+  right:0;
+  top:0;
+  color:var(--stamp);
+  font-size:13px;
+}
+.wv-more[open] > summary::after{ content:'−'; }
 .wv-lead{
   font-family:var(--font-display);
-  font-size:14px;
+  font-size:13.5px;
   line-height:1.9;
   color:var(--stamp);
-  margin-bottom:7px;
 }
 .wv-body{
+  margin-top:8px;
   font-size:13px;
   line-height:2.1;
   font-weight:500;
   color:var(--ink);
 }
 .wv-url{
-  margin:12px 0;
+  margin:10px 0 2px;
   padding:9px 10px;
   border:1px solid var(--line);
   border-radius:var(--radius-sm);

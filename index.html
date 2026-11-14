@@ -15,7 +15,7 @@
      これが無いと、一度開いたことのある人のブラウザが前のCSSやJSを使い続け、
      直したはずの見た目や中身が反映されません。
      css や js を直したら、ここの日付を必ず新しくしてください（3か所とも同じ値に）。 -->
-<link rel="stylesheet" href="css/puzoole.css?v=20261113b">
+<link rel="stylesheet" href="css/puzoole.css?v=20261114a">
 </head>
 <body>
 
@@ -58,10 +58,16 @@
   <!-- アプリの中のブラウザで開かれたときだけ出る注意書きです。
        QRコードリーダーアプリは、記録の保存先がSafariやChromeと別で、
        次のQRコードを読むと集めたどうぶつが消えてしまうことがあります。 -->
+  <!-- ふだんは見出しとボタンだけにして、わけと長いURLは
+       「くわしく」をタップしたときだけ開くようにしています。
+       QRコードを読んで最初に出る画面なので、ここで場所を取りすぎると
+       スタンプ台紙が下へ押しやられてしまうためです。 -->
   <div class="wv-note" id="wvNote" hidden role="alert">
-    <p class="wv-lead" id="wvLead"></p>
-    <p class="wv-body" id="wvBody"></p>
-    <p class="wv-url" id="wvUrl"></p>
+    <details class="wv-more" id="wvMore">
+      <summary class="wv-lead" id="wvLead"></summary>
+      <p class="wv-body" id="wvBody"></p>
+      <p class="wv-url" id="wvUrl"></p>
+    </details>
     <div class="btn-row">
       <button class="btn wide" type="button" id="wvCopy">リンクをコピー</button>
     </div>
@@ -213,7 +219,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/data.js?v=20261113b"></script>
-<script src="js/app.js?v=20261113b"></script>
+<script src="js/data.js?v=20261114a"></script>
+<script src="js/app.js?v=20261114a"></script>
 </body>
 </html>

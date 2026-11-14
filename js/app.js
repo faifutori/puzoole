@@ -1165,8 +1165,24 @@ function inAppBrowser(){
   return false;
 }
 
+/* コピーしてもらうURLを、短く整えます。
+   SNSやメッセージアプリから来ると fbclid のような長い追跡用の文字が付き、
+   画面いっぱいの長さになってしまいます。アプリが読むのは zone（z）だけなので、
+   それ以外は落として、短いリンクを渡します。 */
+function cleanUrl(href){
+  try{
+    var u = new URL(href);
+    var zone = u.searchParams.get('zone') || u.searchParams.get('z');
+    return u.origin + u.pathname + (zone ? '?zone=' + encodeURIComponent(zone) : '');
+  }catch(e){
+    return href;
+  }
+}
+
 function showWebviewNote(openedUrl){
   if(!inAppBrowser()) return;
+
+  var link = cleanUrl(openedUrl);
 
   setRuby($('wvLead'), 'アプリの{中|なか}のブラウザで{開|ひら}かれています');
   setRuby($('wvBody'),
@@ -1174,18 +1190,27 @@ function showWebviewNote(openedUrl){
     '{集|あつ}めたどうぶつが{消|き}えてしまうことがあります。' +
     'スマホのカメラで{読|よ}みとるか、{下|した}のリンクをSafariやChromeで' +
     '{開|ひら}いてね。そうすれば{記録|きろく}がのこります。');
-  $('wvUrl').textContent = openedUrl;
+  $('wvUrl').textContent = link;
+
+  /* コピーできなかったときは、URLを自分で選んでもらうしかないので、
+     たたんである「くわしく」を開いて、文字を出してから知らせます。 */
+  function openMore(){
+    var more = $('wvMore');
+    if(more) more.open = true;
+  }
 
   var copy = $('wvCopy');
   copy.addEventListener('click', function(){
     if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(openedUrl).then(function(){
+      navigator.clipboard.writeText(link).then(function(){
         toast('リンクをコピーしました');
       }, function(){
-        toast('コピーできませんでした。上の文字を長おしして選んでね');
+        openMore();
+        toast('コピーできませんでした。リンクを長おしして選んでね');
       });
     }else{
-      toast('上の文字を長おしして選んでね');
+      openMore();
+      toast('リンクを長おしして選んでね');
     }
   });
 
